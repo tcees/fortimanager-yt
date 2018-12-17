@@ -1,8 +1,8 @@
 import argparse
 import urllib3
 
-from manager import Manager, YouTube, ErroDeOperacao
-from manager.confs import MANAGER, YOUTUBE
+from manager_yt import Manager, YouTube, ErroDeOperacao
+from manager_yt.confs import MANAGER, YOUTUBE
 
 urllib3.disable_warnings()
 
