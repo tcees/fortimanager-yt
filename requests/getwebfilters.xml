@@ -1,0 +1,19 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:r20="http://r200806.ws.fmg.fortinet.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <r20:getPmConfig54AdomObjWebfilterUrlfilter>
+         <path>
+            <adom>root</adom>
+            {% if perfil_id %}
+               <urlfilter>{{ perfil_id }}</urlfilter>
+            {% endif %}
+         </path>
+         {% if not loadsub %}
+            <loadsub>false</loadsub>
+            <fields>id</fields>
+            <fields>name</fields>
+         {% endif %}
+         <session>{{ sessao }}</session>
+      </r20:getPmConfig54AdomObjWebfilterUrlfilter>
+   </soapenv:Body>
+</soapenv:Envelope>
