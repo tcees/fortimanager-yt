@@ -1,0 +1,24 @@
+manager:
+  # Url de acesso a api do manager
+  # Exemplo: 192.168.1.200:8080
+  url: ""
+  # Usuário com permissões de escrita no 
+  # fortimanager e com acesso a api
+  usuario: ""
+  senha: ""
+  # Se o fortimanager usa ssl ou não
+  ssl: True
+  # Pasta onde devem ser armazenados os
+  # arquivos de cache gerados pelo programa
+  pasta_cache: ""
+  # Pasta onde estão armazenados os templates
+  # de requisição a api
+  pasta_templates: "requests/"
+  # Adom que será alterado
+  adom: ""
+
+youtube:
+  # Chave de acesso a api do youtube do google
+  api_key: ""
+  # Se deseja verificar o certificado para a conexão
+  ssl: True

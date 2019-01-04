@@ -3,7 +3,7 @@
    <soapenv:Body>
       <r20:getPmConfig54AdomObjWebfilterUrlfilter>
          <path>
-            <adom>root</adom>
+            <adom>{{ adom }}</adom>
             {% if perfil_id %}
                <urlfilter>{{ perfil_id }}</urlfilter>
             {% endif %}

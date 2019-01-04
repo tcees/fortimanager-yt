@@ -3,10 +3,9 @@
    <soapenv:Body>
       <r20:execSecurityconsoleInstallPackage>
          <data>
-            <adom>root</adom>
+            <adom>{{ adom }}</adom>
             <pkg>tcecluster</pkg>
             <flags>ifpolicy_only</flags>
-            <flags>check_pkg_st</flags>
             {% if revisao %}
                <flags>generate_rev</flags>
                <adom_rev_name>{{ rev_nome }}</adom_rev_name>

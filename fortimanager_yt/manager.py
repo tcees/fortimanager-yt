@@ -14,7 +14,7 @@ class Manager:
         as devidas permições.
     """
 
-    def __init__(self, endereco, pasta_cache="", templates="manager/requests/", 
+    def __init__(self, endereco, adom, pasta_cache="", templates="manager/requests/", 
                 verify=True, youtube=None):
         """Construtor
 
@@ -30,6 +30,7 @@ class Manager:
                 usar recursos do YouTube, deverá especificar um objeto do 
                 tipo YouTube
         """
+        self.adom = adom
         self.endereco = endereco
         self.pcache = pasta_cache
         self.token = None
@@ -43,10 +44,12 @@ class Manager:
 
         if youtube:
             self.youtube = youtube
-            self.youtube_regex = "(www\.youtube\.com|youtu\.be)/(watch\?v=|embed/)?"
+            self.youtube_regex = r"(www\.youtube\.com|youtu\.be)/(watch\?v=|embed/)?"
 
     def enviar(self, corpo):
         """Envia uma requisição para o FortiManager
+        Caso a requisição retorne algum código diferente
+        de 0 (sucesso), é lançada uma excessão `ErroDeOperacao`
 
         Args:
             corpo(str): Corpo da requisição http, deve estar no formato SOAP 
@@ -79,9 +82,12 @@ class Manager:
         Returns:
             `BeautifulSoup` resultado da requisição
         """
-        corpo = Template(open(self.templates+template, "r").read()).render(
-            usuario=usuario,
-            senha=senha)
+        corpo = Template(
+                    open(self.templates+template, "r").read()
+                ).render(
+                    usuario=usuario,
+                    senha=senha
+                )
         sopa = self.enviar(corpo)
         self.token = sopa.find("session").string
         return sopa
@@ -104,8 +110,6 @@ class Manager:
     def obterUrlsLiberadosPerfil(self, perfil, template="getwebfilters.xml"):
         """Obtem urls que já estão liberadas pelo perfil
 
-        Note: É preciso estar logado
-
         Args:
             template(str): Template a ser renderizado
 
@@ -115,11 +119,14 @@ class Manager:
         if not self.token: 
             raise NaoLogado()
 
-        corpo = Template(open(self.templates+template, "r").read()).render(
+        corpo = Template(
+                    open(self.templates+template, "r").read()
+                ).render(
+                    adom=self.adom,
                     sessao=self.token,
                     perfil_id=self.idUrlFilter(perfil),
-                    loadsub=True)
-
+                    loadsub=True
+                )
         sopa = self.enviar(corpo)
         entradas = sopa.find("data").findAll("entries")
         urls = [entrada.url.string for entrada in entradas]
@@ -128,8 +135,6 @@ class Manager:
 
     def idUrlFilter(self, perfil, template="getwebfilters.xml"):
         """Obtém o id de um perfil de usuário de WebUrlFilter
-
-        Note: É preciso estar logado
 
         Args: 
             perfil(str): Nome do perfil
@@ -144,8 +149,11 @@ class Manager:
         if perfil in self.perfis:
             return self.perfis[perfil]
 
-        corpo = Template(open(self.templates+template, "r").read()).render(
-                    sessao=self.token)
+        corpo = Template(
+                    open(self.templates+template, "r").read()
+                ).render(
+                    sessao=self.token
+                )
 
         sopa = self.enviar(corpo)
         
@@ -154,6 +162,7 @@ class Manager:
 
         if perfil in self.perfis:
             return self.perfis[perfil]
+        
         else:
             raise PerfilNaoExiste(perfil)
 
@@ -170,17 +179,16 @@ class Manager:
         Return:
             `BeautifulSoup` resultado da requisição
         """
+        if not self.token: raise NaoLogado()
 
-        if not self.token:
-            raise NaoLogado()
-
-        revisao = len(rev_nome) > 0
-        
-        corpo = Template(open(self.templates+template, "r").read()).render(
-            rev_nome=rev_nome, 
-            rev_comentario=rev_comentario, 
-            sessao=self.token)
-        
+        corpo = Template(
+                    open(self.templates+template, "r").read()
+                ).render(
+                    adom=self.adom,
+                    rev_nome=rev_nome, 
+                    rev_comentario=rev_comentario, 
+                    sessao=self.token
+                )
         return self.enviar(corpo)
 
     def liberar(self, urls, perfis, tipo="simple", acao="exempt", 
@@ -216,8 +224,7 @@ class Manager:
         if not status in ["enable", "disable"]:
             raise ValueError(status+" não é um valor de status válido")
 
-        if not self.token: 
-            raise NaoLogado()
+        if not self.token: raise NaoLogado()
 
         respostas = {}
 
@@ -236,10 +243,17 @@ class Manager:
                 print("Nehuma url nova para o perfil %s" % perfil)
                 continue
 
-            corpo = Template(open(self.templates+template, "r").read()).render(
-                urls=urls, urlfilter=perfil_id, tipo=tipo, acao=acao,
-                status=status, sessao=self.token)
-
+            corpo = Template(
+                        open(self.templates+template, "r").read()
+                    ).render(
+                        adom=self.adom,
+                        urls=urls, 
+                        urlfilter=perfil_id, 
+                        tipo=tipo, 
+                        acao=acao,
+                        status=status, 
+                        sessao=self.token
+                    )
             respostas[perfil] = self.enviar(corpo)
             self.atualizarCache(urls, perfil, "a")
 
