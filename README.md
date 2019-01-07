@@ -1,5 +1,7 @@
 # FortiMananager-YouTube
-Aplicativo para automatizar liberação de videos do YouTube no FortiManager (FortiGate) de forma fácil, que pode ser colocado em um automatizador de tarefas como o cron ou no agendador de tarefas do windows.
+Aplicativo para automatizar liberação de videos do YouTube no FortiManager (FortiGate) de forma fácil, que pode ser colocado em um automatizador de tarefas como o cron ou no agendador de tarefas do windows. De forma que pode-se manter apenas videos de uma unica playlist ou canal do youtube liberados.
+
+A demanda para este projeto surgiu com a necessidade de se liberar videos de nosso canal no YouTube dentro do nosso ambiente de trabalho. Liberar todo o domínio do YouTube não era uma opção, logo precisavamos liberar video por video do nosso canal. Como a frequencia de postagem de videos é relativamente alta e uma quantidade de videos grande, fazer isso manualmente trazia uma série de complicações. Desta forma essa ferramenta de automatização se tornou necessária para nossas necessidades internas, e esperamos com este projeto poder ajudar outras pessoas que precisem de soluções parecidas.
 
 ## Pré-requisitos
 * [Uma chave de api do YouTube](https://developers.google.com/youtube/registering_an_application?hl=pt-br)
