@@ -1,46 +1,48 @@
 # FortiMananager-YouTube
-Aplicativo para automatizar liberação de videos do YouTube no FortiManager (FortiGate) de forma fácil, que pode ser colocado em um automatizador de tarefas como o cron ou no agendador de tarefas do windows. De forma que pode-se manter apenas videos de uma unica playlist ou canal do youtube liberados.
-
-A demanda para este projeto surgiu com a necessidade de se liberar videos de nosso canal no YouTube dentro do nosso ambiente de trabalho. Liberar todo o domínio do YouTube não era uma opção, logo precisavamos liberar video por video do nosso canal. Como a frequencia de postagem de videos é relativamente alta e uma quantidade de videos grande, fazer isso manualmente trazia uma série de complicações. Desta forma essa ferramenta de automatização se tornou necessária para nossas necessidades internas, e esperamos com este projeto poder ajudar outras pessoas que precisem de soluções parecidas.
+O FortiMananager-YouTube é um aplicativo desenvolvido em Python para realizar a liberação de vídeos de uma playlist do YouTube no Fortinet FortiManager.
 
 ## Pré-requisitos
-* [Uma chave de api do YouTube](https://developers.google.com/youtube/registering_an_application?hl=pt-br)
+* [Chave de api do YouTube](https://developers.google.com/youtube/registering_an_application?hl=pt-br);
+* Conta configurada no FortiManager com permissão para escrita nos perfis de webfilters;
+* Python 3.
 
-* Uma conta configurada no FortiManager com acesso a api e permissões para escrita nos perfis de webfilters
+## Instalação
+* Após clonar o repositório, acessar a pasta e executar o comando abaixo:
+```bash
+pip3 install .
+```
+* Configure o arquivo `fortimanagerYTconfig.yaml`, disponível na pasta do módulo, com os valores necessários;
+* Rode o módulo conforme parâmetros abaixo:
+```bash
+python3 -m fortimanager_yt perfis [perfis ...] [-h] [--sync] [--playlist_id PLAYLIST_ID] [--todos] [--nao_instalar]
+```
 
-## Como usar
-Configure o arquivo `fortimanagerYTconfig.yaml` com os valores necessários
+## Exemplos 
+Para realizar a liberação de todos os vídeos encontrados na playlist `xxxxxxxxxxxxxxx` para os perfis `perfil1` e `perfil2`, rode o comando abaixo:
+```bash
+python3 -m fortimanager_yt perfil1 perfil2 --playlist_id xxxxxxxxxxxxxxx --todos`
+```
 
-Rode o módulo da seguinte forma:
-
-`python3 -m fortimanager_yt perfis [perfis ...] [-h] [--sync] [--playlist_id PLAYLIST_ID] [--todos] [--nao_instalar]`
-
-Exemplo: 
-`python3 -m fortimanager_yt perfil1 perfil2 --playlist_id xxxxxxxxxxxxxxx --todos`
-
-Este comando iria liberar todos os videos encontrados na playlist `xxxxxxxxxxxxxxx` do youtube que ainda não estão liberados no FortiManager para os perfis: `perfil1` e `perfil2`.
-
-### Lista de parâmetros linha de comando
+### Lista de parâmetros
 * perfis
 
-Perfis de webfilter a qual serão aplicadas as alterações.
-Pode ser passado varios perfis
+Perfis de webfilter a qual serão aplicadas as alterações. Aceita-se vários perfis.
 
 * sync
 
-Modo de sincronização do cache. Quando este parâmetro é especificado, o programa atualizará o cache local somente.
+Modo de sincronização do cache. Quando este parâmetro é especificado, será atualizado o cache local somente.
 
 * playlist_id
 
-Especifica uma playlist do YouTube como alvoda operação a ser realizada.
+Especifica a playlist do YouTube.
 
 * todos
 
-Executa a operação para TODOS os videos da playlist especificada. Caso este parâmetro seja omitido, a operação utilizará aos 50 ultimos videos postados na playlist.
+Executa a operação para TODOS os videos da playlist especificada. Caso este parâmetro seja omitido, serão liberados apenas os 50 ultimos videos postados na playlist.
 
 * nao_instalar
 
-Ao fim dos procedimentos não realizar a instalação no Manager. Caso seja omitido, o programa instalará as alterações no FortiManager, fazendo a configuração valer no firewall associado a ele.
+Ao fim dos procedimentos, não realizar a instalação no FortiManager. Caso seja omitido, o programa instalará as alterações.
 
 ### Arquivo de configuração
 Antes de usar o programa é importante configura-lo dentro do arquivo de configuração `fortimanagerYTconfig.yaml`.
@@ -83,13 +85,8 @@ youtube:
   ssl: True
 ```
 
-## Limitações e problemas
-O programa tem algumas limitações e pode gerar problemas com a integridade do FortiManager.
+## Limitações
+O programa possui algumas limitações que devem ser observadas.
 
-* A instalação sobe TODAS as configurações pendentes
-
-Como a instalação no FortiManager sobe todas as configurações pendentes, se mais de uma pessoa configura o manager há o risco de, ao mesmo tempo que alguém estiver fazendo alguma alteração nas configurações haver uma execução deste programa com instalação. O que instalaria, além da configuração gerada pelo programa, a configuração inacabada pela pessoa trabalhando. Portanto, prudência ao usar este programa ajuda.
-
-* A playlist é a unica forma de se encontrar videos para liberação
-
-É uma limitação de projeto, mas que pode ser superada com mais algum tempo de trabalho, se houver demanda para isso.
+* A instalação utiliza TODAS as configurações pendentes no FortiManager, mesmo aquelas que foram feitas ou possam estar sendo feitas por outro usuário.
+* A playlist é a unica forma de se encontrar videos para liberação.
