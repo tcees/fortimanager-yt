@@ -7,7 +7,7 @@ O FortiMananager-YouTube é um aplicativo desenvolvido em Python para realizar a
 * Python 3.
 
 ## Instalação
-* Após clonar o repositório, acessar a pasta e executar o comando abaixo:
+* Após clonar o repositório, acesse a pasta e execute o comando abaixo:
 ```bash
 pip3 install .
 ```
@@ -20,13 +20,13 @@ python3 -m fortimanager_yt perfis [perfis ...] [-h] [--sync] [--playlist_id PLAY
 ## Exemplos 
 Para realizar a liberação de todos os vídeos encontrados na playlist `xxxxxxxxxxxxxxx` para os perfis `perfil1` e `perfil2`, rode o comando abaixo:
 ```bash
-python3 -m fortimanager_yt perfil1 perfil2 --playlist_id xxxxxxxxxxxxxxx --todos`
+python3 -m fortimanager_yt perfil1 perfil2 --playlist_id xxxxxxxxxxxxxxx --todos
 ```
 
-### Lista de parâmetros
+## Lista de parâmetros
 * perfis
 
-Perfis de webfilter a qual serão aplicadas as alterações. Aceita-se vários perfis.
+Lista de perfis de webfilter para aplicação das alterações.
 
 * sync
 
@@ -38,14 +38,14 @@ Especifica a playlist do YouTube.
 
 * todos
 
-Executa a operação para TODOS os videos da playlist especificada. Caso este parâmetro seja omitido, serão liberados apenas os 50 ultimos videos postados na playlist.
+Executa a operação para TODOS os vídeos da playlist especificada. Caso este parâmetro seja omitido, serão liberados apenas os 50 últimos vídeos postados na playlist.
 
 * nao_instalar
 
 Ao fim dos procedimentos, não realizar a instalação no FortiManager. Caso seja omitido, o programa instalará as alterações.
 
-### Arquivo de configuração
-Antes de usar o programa é importante configura-lo dentro do arquivo de configuração `fortimanagerYTconfig.yaml`.
+## Arquivo de configuração
+Antes de usar o programa é importante configurá-lo dentro do arquivo de configuração `fortimanagerYTconfig.yaml`.
 Este arquivo tem a seguinte forma:
 ```
 # Informações sobre o fortimanager
@@ -89,4 +89,5 @@ youtube:
 O programa possui algumas limitações que devem ser observadas.
 
 * A instalação utiliza TODAS as configurações pendentes no FortiManager, mesmo aquelas que foram feitas ou possam estar sendo feitas por outro usuário.
-* A playlist é a unica forma de se encontrar videos para liberação.
+* A playlist é a única forma de se encontrar vídeos para liberação.
+
