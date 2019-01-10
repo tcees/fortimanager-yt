@@ -1,4 +1,4 @@
-# FortiMananager-YouTube
+# FortiManager-YouTube
 O FortiMananager-YouTube é um aplicativo desenvolvido em Python para realizar a liberação de vídeos de uma playlist do YouTube no Fortinet FortiManager.
 
 ## Pré-requisitos
