@@ -28,10 +28,6 @@ python3 -m fortimanager_yt perfil1 perfil2 --playlist_id xxxxxxxxxxxxxxx --todos
 
 Lista de perfis de webfilter para aplicação das alterações.
 
-* sync
-
-Modo de sincronização do cache. Quando este parâmetro é especificado, será atualizado o cache local somente.
-
 * playlist_id
 
 Especifica a playlist do YouTube.
@@ -48,39 +44,24 @@ Ao fim dos procedimentos, não realizar a instalação no FortiManager. Caso sej
 Antes de usar o programa é importante configurá-lo dentro do arquivo de configuração `fortimanagerYTconfig.yaml`.
 Este arquivo tem a seguinte forma:
 ```
-# Informações sobre o fortimanager
 manager:
-
   # Url de acesso a api do manager
   # Exemplo: 192.168.1.200:8080
   url: ""
-
-  # Usuário com permissões de escrita no 
-  # fortimanager e com acesso a api
+  # Usuário com permissões de escrita no fortimanager e com acesso a api
   usuario: ""
   senha: ""
-
   # Se o fortimanager usa ssl ou não
   ssl: True
-
-  # Pasta onde devem ser armazenados os
-  # arquivos de cache gerados pelo programa
-  pasta_cache: ""
-
-  # Pasta onde estão armazenados os templates
-  # de requisição a api
+  # Pasta onde estão armazenados os templates de requisição a api
+  # O caminho relativo só irá funcionar caso rode o programa na pasta atual
   pasta_templates: "requests/"
-
   # Adom que será alterado
   adom: ""
 
-# Configurações do youtube para se obter informações 
-# sobre videos
 youtube:
-  
   # Chave de acesso a api do youtube do google
   api_key: ""
-
   # Se deseja verificar o certificado para a conexão
   ssl: True
 ```

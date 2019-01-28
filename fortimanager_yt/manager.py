@@ -14,14 +14,12 @@ class Manager:
         as devidas permições.
     """
 
-    def __init__(self, endereco, adom, pasta_cache="", templates="manager/requests/", 
+    def __init__(self, endereco, adom, templates="manager/requests/", 
                 verify=True, youtube=None):
         """Construtor
 
         Args:
             endereco(str): Endereço de rede do FortiManager
-            pasta_cache(str, optional): A pasta onde devem estar os arquivos 
-                de cache dos perfis de WebFilter
             templates(str, optional): Pasta onde estão os templates com as 
                 requisições
             verify(bool, optional): Verificar ou não certificados SSL ao 
@@ -32,10 +30,8 @@ class Manager:
         """
         self.adom = adom
         self.endereco = endereco
-        self.pcache = pasta_cache
         self.token = None
         self.templates = templates
-        self.cache_ext = ".cache"
         self.perfis = {}
         self.sessao = Session()
         self.sessao.headers["content-type"] = "text/xml;charset=UTF-8"
@@ -60,13 +56,17 @@ class Manager:
         """
         resposta = self.sessao.post(self.endereco+"/FortiManagerWSxml", data=corpo)
         sopa = BeautifulSoup(resposta.text, "html.parser")
-        errorcode = sopa.find("errorcode").string
-        errormsg = sopa.find("errormsg").string
+        if sopa.find("errorcode"):
+            errorcode = sopa.find("errorcode").string
+            errormsg = sopa.find("errormsg").string
         
-        if errorcode != "0":
-            raise ErroDeOperacao(errorcode, errormsg)
+            if errorcode != "0":
+                raise ErroDeOperacao(errorcode, errormsg)
 
-        return sopa
+            return sopa
+        else:
+            print(resposta.text)
+            return None
 
     def iniciar(self, usuario, senha, template="login.xml"):
         """Inicia uma sessão com o FortiManager
@@ -89,8 +89,10 @@ class Manager:
                     senha=senha
                 )
         sopa = self.enviar(corpo)
-        self.token = sopa.find("session").string
-        return sopa
+
+        if sopa:
+            self.token = sopa.find("session").string
+            return sopa
 
     def destruir(self, template="logout.xml"):
         """Destrói a sessão atual no Manager
@@ -152,9 +154,9 @@ class Manager:
         corpo = Template(
                     open(self.templates+template, "r").read()
                 ).render(
+                    adom=self.adom,
                     sessao=self.token
                 )
-
         sopa = self.enviar(corpo)
         
         for entrada in sopa.findAll("data"):
@@ -235,9 +237,9 @@ class Manager:
             except PerfilNaoExiste:
                 print("O perfil de WebUrlFilter '%s' não existe no Manager" % perfil)
                 continue
-
-            cache = self.obterCache(perfil)
-            urls = set(urls).difference(cache)
+            
+            atual = self.obterUrlsLiberadosPerfil(perfil)
+            urls = set(urls).difference(atual)
 
             if len(urls) == 0:
                 print("Nehuma url nova para o perfil %s" % perfil)
@@ -255,7 +257,6 @@ class Manager:
                         sessao=self.token
                     )
             respostas[perfil] = self.enviar(corpo)
-            self.atualizarCache(urls, perfil, "a")
 
         return respostas
 
@@ -297,66 +298,6 @@ class Manager:
             return resposta
         else:
             print("Nenhum video encontrado")
-
-    def sincronizarCache(self, perfis):
-        """Sincroniza as urls que estão no Manager com o arquivo de 
-        cache
-
-        Args:
-            perfis(:obj:`list` of str): Perfis a fazer a sincronia
-        """
-        if not self.token:
-            raise NaoLogado()
-
-        for perfil in perfis:
-            try:
-                liberados = self.obterUrlsLiberadosPerfil(perfil)
-                print(len(liberados))
-                self.atualizarCache(liberados, perfil, "w")
-            
-            except KeyError:
-                print("Perfil %s inexistente" % perfil)
-
-    def obterCache(self, perfil):
-        """Abre um arquivo de cache que contém as urls liberadas para 
-        determinado perfil
-
-        Args:
-            perfil(str): O perfil de WebFilter do fortimanager
-
-        Returns:
-            Lista com todas as urls liberadas para o perfil ou None 
-            se não for encontrado o arquivo de cache
-
-        Raises:
-            FileNotFoundError: Quando o arquivo de cache para o perfil 
-                especificado não existe
-        """
-        arquivo = self.pcache+perfil+self.cache_ext
-        return set(open(arquivo, "r").read().split("\n")[:-1])
-
-    def atualizarCache(self, urls, perfil, modo="a"):
-        """Abre um arquivo de cache para edição e adiciona, sobrescrevendo 
-        ou não, as urls a este arquivo
-
-        Args:
-            urls(obj:`set` of str): Lista de urls a ser adicionada 
-                ao cache
-            perfil(str): Especifica o cache de determinado perfil
-            modo(str): O modo de escrita no arquivo, por padrão "a" 
-                que coloca as `urls` no fim do arquivo, "w" sobrescreve 
-                o arquivo, deixando apenas as urls
-        """
-        if not modo in ["a", "w"]:
-            raise ValueError("O modo deve ser 'a' (append) ou 'w' (write)")
-
-        arquivo = self.pcache+perfil+self.cache_ext
-        cache = open(arquivo, modo)
-
-        for url in urls:
-            cache.write(url+"\n")
-        else:
-            cache.close()
 
 
 class NaoLogado(Exception):

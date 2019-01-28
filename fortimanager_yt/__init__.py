@@ -25,10 +25,6 @@ parser = argparse.ArgumentParser(
 parser.add_argument("perfis", 
     help="Perfis de webfilter a qual serão aplicadas as alterações",
     nargs="+")
-parser.add_argument("--sync", 
-    help="Sincroniza os arquivos de cache dos `perfis` de acordo com "+
-        "o que está no manager", 
-    action="store_true")
 parser.add_argument("--playlist_id", "-p", 
     help="Playlist a qual deverá ser verificada se existem videos não "+
         "liberados no manager."
