@@ -18,9 +18,9 @@ python3 -m fortimanager_yt perfis [perfis ...] [-h] [--sync] [--playlist_id PLAY
 ```
 
 ## Exemplos 
-Para realizar a liberação de todos os vídeos encontrados na playlist `xxxxxxxxxxxxxxx` para os perfis `perfil1` e `perfil2`, rode o comando abaixo:
+Para realizar a liberação de todos os vídeos encontrados na playlist com id `<id>` para os perfis `<perfil1>` e `<perfil2>`, rode o comando abaixo:
 ```bash
-python3 -m fortimanager_yt perfil1 perfil2 --playlist_id xxxxxxxxxxxxxxx --todos
+python3 -m fortimanager_yt <perfil1> <perfil2> --playlist_id <id> --todos
 ```
 
 ## Lista de parâmetros
@@ -41,8 +41,8 @@ Executa a operação para TODOS os vídeos da playlist especificada. Caso este p
 Ao fim dos procedimentos, não realizar a instalação no FortiManager. Caso seja omitido, o programa instalará as alterações.
 
 ## Arquivo de configuração
-Antes de usar o programa é importante configurá-lo dentro do arquivo de configuração `fortimanagerYTconfig.yaml`.
-Este arquivo tem a seguinte forma:
+Antes de usar o programa é importante configurá-lo, editando o arquivo `fortimanagerYTconfig.yaml`.
+Este arquivo possui o seguinte formato:
 ```
 manager:
   # Url de acesso a api do manager
