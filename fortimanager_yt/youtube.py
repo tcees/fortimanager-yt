@@ -43,9 +43,12 @@ class YouTube:
                     self.url+"/playlistItems", 
                     params=parametros).json()
             
-            for video in json["items"]:
-                videos.append(video["snippet"]["resourceId"]["videoId"])
-            
+            if "items" in json:
+                for video in json["items"]:
+                    videos.append(video["snippet"]["resourceId"]["videoId"])
+            else:
+                break
+                
             if not "nextPageToken" in json: 
                 break
             

@@ -7,9 +7,6 @@ manager:
   senha: ""
   # Se o fortimanager usa ssl ou não
   ssl: True
-  # Pasta onde estão armazenados os templates de requisição a api
-  # O caminho relativo só irá funcionar caso rode o programa na pasta atual
-  pasta_templates: "requests/"
   # Adom que será alterado
   adom: ""
 

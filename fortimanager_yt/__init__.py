@@ -1,12 +1,8 @@
 import argparse
 import urllib3
-import yaml
 
 from .manager import Manager, ErroDeOperacao
 from .youtube import YouTube
-
-# Carrega arquivo de configurações
-cfg = yaml.load(open("fortimanagerYTconfig.yaml", "r"))
 
 # Desliga a exibição de alertas do tipo warning lançados pelo urllib
 urllib3.disable_warnings()
@@ -25,7 +21,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("perfis", 
     help="Perfis de webfilter a qual serão aplicadas as alterações",
     nargs="+")
-parser.add_argument("--playlist_id", "-p", 
+parser.add_argument("playlist_id",
     help="Playlist a qual deverá ser verificada se existem videos não "+
         "liberados no manager."
     )
@@ -36,3 +32,11 @@ parser.add_argument("--todos",
 parser.add_argument("--nao_instalar", 
     help="Realiza as alterações mas não manda instalar as alterações.", 
     action="store_true")
+parser.add_argument("--config", "-c",
+    help="Caminho para o arquivo de configuração, necessário após intalar."+
+        "Caso não seja especificado, buscará o arquivo com nome: fortimanagerYTconfig.yaml "+
+        "na pasta atual."
+)
+parser.add_argument("--qtd", "-q", type=int, default=50,
+    help="Quantidade de videos a liberar da playlist especificada."
+)

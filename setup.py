@@ -9,8 +9,5 @@ setup(name='fortimanager_yt',
       url='https://tce.es.gov.br',
       packages=['fortimanager_yt'],
       include_package_data=True,
-      install_requires=['bs4', 'requests', 'jinja2'],
-      package_data={
-        '.': ['requests/*.xml']
-      },
+      install_requires=['bs4', 'requests', 'jinja2']
      )
