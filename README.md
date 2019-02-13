@@ -3,7 +3,7 @@ O FortiMananager-YouTube é um aplicativo desenvolvido em Python para realizar a
 
 ## Pré-requisitos
 * [Chave de api do YouTube](https://developers.google.com/youtube/registering_an_application?hl=pt-br);
-* Conta configurada no FortiManager com permissão para escrita nos perfis de webfilters;
+* Conta configurada no FortiManager com permissão para escrita nos perfis de webfilters e acesso a API;
 * Python 3.
 
 ## Instalação
@@ -11,16 +11,15 @@ O FortiMananager-YouTube é um aplicativo desenvolvido em Python para realizar a
 ```bash
 pip3 install .
 ```
-* Configure o arquivo `fortimanagerYTconfig.yaml`, disponível na pasta do módulo, com os valores necessários;
 * Rode o módulo conforme parâmetros abaixo:
 ```bash
-python3 -m fortimanager_yt perfis [perfis ...] [-h] [--sync] [--playlist_id PLAYLIST_ID] [--todos] [--nao_instalar]
+python3 -m fortimanager_yt perfis <perfis...> <playlist_id> [-h] [--todos] [--nao_instalar] [--config <caminho>] [--qtd <numero>]
 ```
 
 ## Exemplos 
 Para realizar a liberação de todos os vídeos encontrados na playlist com id `<id>` para os perfis `<perfil1>` e `<perfil2>`, rode o comando abaixo:
 ```bash
-python3 -m fortimanager_yt <perfil1> <perfil2> --playlist_id <id> --todos
+python3 -m fortimanager_yt <perfil1> <perfil2> <id> --todos
 ```
 
 ## Lista de parâmetros
@@ -34,7 +33,15 @@ Especifica a playlist do YouTube.
 
 * todos
 
-Executa a operação para TODOS os vídeos da playlist especificada. Caso este parâmetro seja omitido, serão liberados apenas os 50 últimos vídeos postados na playlist.
+Executa a operação para TODOS os vídeos da playlist especificada (max 10000). Caso este parâmetro seja omitido, será utilizado o valor do parâmetro **qtd**.
+
+* config
+
+Especifica a localização do arquivo de configuração. Caso seja omitido buscará na pasta onde está sendo executado um arquivo com nome **fortimanagerYTconfig.yaml**.
+
+* qtd
+
+Quantidade de videos da playlist a ser liberado. Este parâmetro não terá efeito caso o parâmetro **todos** for passado. O valor padrão de qtd é 50.
 
 * nao_instalar
 
@@ -53,9 +60,6 @@ manager:
   senha: ""
   # Se o fortimanager usa ssl ou não
   ssl: True
-  # Pasta onde estão armazenados os templates de requisição a api
-  # O caminho relativo só irá funcionar caso rode o programa na pasta atual
-  pasta_templates: "requests/"
   # Adom que será alterado
   adom: ""
 
@@ -68,7 +72,4 @@ youtube:
 
 ## Limitações
 O programa possui algumas limitações que devem ser observadas.
-
-* A instalação utiliza TODAS as configurações pendentes no FortiManager, mesmo aquelas que foram feitas ou possam estar sendo feitas por outro usuário.
 * A playlist é a única forma de se encontrar vídeos para liberação.
-

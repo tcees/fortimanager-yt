@@ -19,15 +19,14 @@ parser = argparse.ArgumentParser(
         "configurações via api.")
 
 parser.add_argument("perfis", 
-    help="Perfis de webfilter a qual serão aplicadas as alterações",
+    help="Lista de perfis de webfilter para aplicação das alterações.",
     nargs="+")
 parser.add_argument("playlist_id",
-    help="Playlist a qual deverá ser verificada se existem videos não "+
-        "liberados no manager."
-    )
+    help="Especifica a playlist do YouTube.",
+    nargs=1)
 parser.add_argument("--todos", 
-    help="Libera todos os videos de uma playlist que ainda não estão "+
-        "liberados no manager", 
+    help="Executa a operação para TODOS os vídeos da playlist especificada (max 10000). "+
+        "Caso este parâmetro seja omitido, será utilizado o valor do parâmetro `qtd`.", 
     action="store_true")
 parser.add_argument("--nao_instalar", 
     help="Realiza as alterações mas não manda instalar as alterações.", 
