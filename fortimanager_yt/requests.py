@@ -34,6 +34,9 @@ installconfig = """
                <adom_rev_name>{{ rev_nome }}</adom_rev_name>
                <adom_rev_comments>{{ rev_comentario }}</adom_rev_comments>
             {% endif %}
+            {% if preview %}
+               <flags>preview</flags>
+            {% endif %}
          </data>
          <session>{{ sessao }}</session>
       </r20:execSecurityconsoleInstallPackage>
@@ -85,6 +88,34 @@ seturl = """
          {% endfor %}
          <session>{{ sessao }}</session>
       </r20:addPmConfig54AdomObjWebfilterUrlfilterEntries>
+   </soapenv:Body>
+</soapenv:Envelope>
+"""
+
+gettask = """
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:r20="http://r200806.ws.fmg.fortinet.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <r20:getTaskTask>
+         <path>
+            <task>{{ task }}</task>
+         </path>
+         <session>{{ sessao }}</session>
+      </r20:getTaskTask>
+   </soapenv:Body>
+</soapenv:Envelope>
+"""
+
+cancel_install = """
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:r20="http://r200806.ws.fmg.fortinet.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <r20:execSecurityconsolePackageCancelInstall>
+         <data>
+            <adom>{{ adom }}</adom>
+         </data>
+         <session>{{ sessao }}</session>
+      </r20:execSecurityconsolePackageCancelInstall>
    </soapenv:Body>
 </soapenv:Envelope>
 """

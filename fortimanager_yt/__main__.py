@@ -1,23 +1,19 @@
 import yaml
 import os
 
-from .__init__ import *
+from fortimanager_yt import *
 
 args = parser.parse_args()
 
 # Carrega arquivo de configurações
 if args.config:
-
     if os.path.isfile(args.config):
         cfg = yaml.load(open(args.config).read())
-
     else:
         print("Arquivo de configuração especificado não existe.")
         exit(0)
-
 elif os.path.isfile("fortimanagerYTconfig.yaml"):
         cfg = yaml.load(open("fortimanagerYTconfig.yaml").read())
-
 else:
     print("É necessário especificar um arquivo de configuração!")
     exit(0)
@@ -25,9 +21,7 @@ else:
 youtube = YouTube(cfg["youtube"]["api_key"], cfg["youtube"]["ssl"])
 
 manager = Manager(cfg["manager"]["url"], cfg["manager"]["adom"], 
-                    cfg["manager"]["ssl"], 
-                    youtube
-                )
+                    cfg["manager"]["ssl"], youtube)
 
 try:
     # Inicia a sessão com o manager
@@ -41,15 +35,7 @@ except ErroDeOperacao as erro:
     exit(2)
 
 try:
-    
-    # Caso nenhuma playlist seja passada não é possivel realizar a verificação
-    if not args.playlist_id:
-
-        print("[-] Para liberar videos de uma playlist YouTube é")
-        print("    necessário passar o id da Playlist a ser liberada.")
-
-    else:
-        
+    if manager.is_seguro():
         print("[+] PlayList ID:", args.playlist_id)
         print("    Perfis:", args.perfis)
         print("    Instalar?", (not args.nao_instalar))
@@ -62,26 +48,23 @@ try:
         
         # Tenta realizar a liberação dos videos que ainda não foram liberados
         resp = manager.liberarVideosYouTubePlaylist(
-                args.perfis, 
-                args.playlist_id, 
-                todos=args.todos,
-                quantidade=args.qtd
-            )
+                args.perfis, args.playlist_id, 
+                todos=args.todos, quantidade=args.qtd)
         
         if resp:
             print("[*] Liberação feita com sucesso.")
-
             if not args.nao_instalar:
-                
                 print("[*] Instalando...")
-                
                 manager.instalar()
-                
                 print("[*] Instalação concluida!")
-                
         else:
             print("[+] Nenhum video encontrado para liberação")
-
+    else:
+        print("[+] Não é possivél fazer alterações no manager no momento.")
+        print("    Há configurações pendentes.")
+        print("    Saindo...")
+        manager.cancelar()
+    
 except ErroDeOperacao as erro:
     
     print(erro)

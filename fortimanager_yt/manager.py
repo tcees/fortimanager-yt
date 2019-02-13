@@ -1,9 +1,10 @@
 from os import path
+from time import sleep
 
 from bs4 import BeautifulSoup
 from jinja2 import Template
 from requests import Session
-from . import requests as req
+from fortimanager_yt import requests
 
 
 class Manager:
@@ -78,7 +79,7 @@ class Manager:
         Returns:
             `BeautifulSoup` resultado da requisição
         """
-        corpo = Template(req.login).render(
+        corpo = Template(requests.login).render(
                                     usuario=usuario,
                                     senha=senha)
         sopa = self.enviar(corpo)
@@ -95,7 +96,7 @@ class Manager:
         """
         if not self.token: raise NaoLogado()
         
-        corpo = Template(req.logout).render(sessao=self.token)
+        corpo = Template(requests.logout).render(sessao=self.token)
         return self.enviar(corpo)
 
     def obterUrlsLiberadosPerfil(self, perfil):
@@ -107,7 +108,7 @@ class Manager:
         if not self.token: 
             raise NaoLogado()
 
-        corpo = Template(req.getwebfilters).render(
+        corpo = Template(requests.getwebfilters).render(
                                     adom=self.adom,
                                     sessao=self.token,
                                     perfil_id=self.idUrlFilter(perfil),
@@ -134,7 +135,7 @@ class Manager:
         if perfil in self.perfis:
             return self.perfis[perfil]
 
-        corpo = Template(req.getwebfilters).render(
+        corpo = Template(requests.getwebfilters).render(
                                     adom=self.adom,
                                     sessao=self.token)
         sopa = self.enviar(corpo)
@@ -148,7 +149,7 @@ class Manager:
         else:
             raise PerfilNaoExiste(perfil)
 
-    def instalar(self, rev_nome="", rev_comentario=""):
+    def instalar(self, rev_nome="", rev_comentario="", preview=False):
         """Aplica as configurações no Firewall
 
         Note: É preciso estar logado
@@ -156,18 +157,47 @@ class Manager:
         Args:
             rev_nome(str): Um nome para a revisão que será criada
             rev_comentario(str): O comentário para a revisão criada
+            preview(bool): Previsão da instalação
 
         Return:
             `BeautifulSoup` resultado da requisição
         """
         if not self.token: raise NaoLogado()
 
-        corpo = Template(req.installconfig).render(
+        corpo = Template(requests.installconfig).render(
                                         adom=self.adom,
                                         rev_nome=rev_nome, 
                                         rev_comentario=rev_comentario, 
-                                        sessao=self.token
+                                        sessao=self.token,
+                                        preview=preview
                                     )
+        return self.enviar(corpo)
+
+    def is_seguro(self):
+        resposta = self.instalar(preview=True)
+        task_id = int(resposta.find("task").text)
+        task = self.get_task(task_id)
+        while int(task.find("percent").text) != 100:
+            sleep(0.25)
+            task = self.get_task(task_id)
+        detail = task.find("line").find("detail").text
+        return detail == "no installing devices/no changes on package"
+
+
+    def get_task(self, task_id):
+        if not self.token: raise NaoLogado()
+        corpo = Template(requests.gettask).render(
+                                task=task_id,
+                                sessao=self.token
+                            )
+        return self.enviar(corpo)
+
+    def cancelar(self):
+        if not self.token: raise NaoLogado()
+        corpo = Template(requests.cancel_install).render(
+                                adom=self.adom,
+                                sessao=self.token
+                            )
         return self.enviar(corpo)
 
     def liberar(self, urls, perfis, tipo="simple", acao="exempt", 
@@ -219,7 +249,7 @@ class Manager:
             if len(urls) == 0:
                 continue
 
-            corpo = Template(req.seturl).render(
+            corpo = Template(requests.seturl).render(
                                             adom=self.adom,
                                             urls=urls, 
                                             urlfilter=perfil_id, 
