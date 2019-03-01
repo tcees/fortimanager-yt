@@ -75,7 +75,7 @@ seturl = """
    <soapenv:Body>
       <r20:addPmConfig54AdomObjWebfilterUrlfilterEntries>
          <path>
-            <adom>{{ adom }}</adom> 
+            <adom>{{ adom }}</adom>
             <urlfilter>{{ urlfilter }}</urlfilter>
          </path>
          {% for url in urls %}

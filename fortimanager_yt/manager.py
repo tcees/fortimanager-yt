@@ -11,8 +11,8 @@ class Manager:
     """Simboliza uma instância do FortiManager
 
     Note:
-        É importante que o FortiManager especificado esteja configurado 
-        para o uso da API de configuração e que o usuario passado tenha 
+        É importante que o FortiManager especificado esteja configurado
+        para o uso da API de configuração e que o usuario passado tenha
         as devidas permições.
     """
 
@@ -21,10 +21,10 @@ class Manager:
 
         Args:
             endereco(str): Endereço de rede do FortiManager
-            verify(bool, optional): Verificar ou não certificados SSL ao 
+            verify(bool, optional): Verificar ou não certificados SSL ao
                 conectar com o FortiManager
-            youtube(:obj:manager.YouTube, optional): Se tiver a intenção de 
-                usar recursos do YouTube, deverá especificar um objeto do 
+            youtube(:obj:manager.YouTube, optional): Se tiver a intenção de
+                usar recursos do YouTube, deverá especificar um objeto do
                 tipo YouTube
         """
         self.adom = adom
@@ -46,7 +46,7 @@ class Manager:
         de 0 (sucesso), é lançada uma excessão `ErroDeOperacao`
 
         Args:
-            corpo(str): Corpo da requisição http, deve estar no formato SOAP 
+            corpo(str): Corpo da requisição http, deve estar no formato SOAP
                 reconhecível pela API do Managar
 
         Returns:
@@ -57,7 +57,7 @@ class Manager:
         if sopa.find("errorcode"):
             errorcode = sopa.find("errorcode").string
             errormsg = sopa.find("errormsg").string
-        
+
             if errorcode != "0":
                 raise ErroDeOperacao(errorcode, errormsg)
 
@@ -69,7 +69,7 @@ class Manager:
     def iniciar(self, usuario, senha):
         """Inicia uma sessão com o FortiManager
 
-        Note: O `usuario` utilizado deve ter permissões para logar 
+        Note: O `usuario` utilizado deve ter permissões para logar
             através da API
 
         Args:
@@ -95,7 +95,7 @@ class Manager:
             `BeautifulSoup` resultado da requisição
         """
         if not self.token: raise NaoLogado()
-        
+
         corpo = Template(requests.logout).render(sessao=self.token)
         return self.enviar(corpo)
 
@@ -105,7 +105,7 @@ class Manager:
         Returns:
             `dict` com todas as urls liberadas para cada `perfil`
         """
-        if not self.token: 
+        if not self.token:
             raise NaoLogado()
 
         corpo = Template(requests.getwebfilters).render(
@@ -123,13 +123,13 @@ class Manager:
     def idUrlFilter(self, perfil):
         """Obtém o id de um perfil de usuário de WebUrlFilter
 
-        Args: 
+        Args:
             perfil(str): Nome do perfil
 
         Returns:
             `str` id do `perfil`
         """
-        if not self.token: 
+        if not self.token:
             raise NaoLogado()
 
         if perfil in self.perfis:
@@ -139,13 +139,13 @@ class Manager:
                                     adom=self.adom,
                                     sessao=self.token)
         sopa = self.enviar(corpo)
-        
+
         for entrada in sopa.findAll("data"):
             self.perfis[entrada.find("name").string] = entrada.id.string
 
         if perfil in self.perfis:
             return self.perfis[perfil]
-        
+
         else:
             raise PerfilNaoExiste(perfil)
 
@@ -163,11 +163,12 @@ class Manager:
             `BeautifulSoup` resultado da requisição
         """
         if not self.token: raise NaoLogado()
-
+        revisao = len(rev_nome) > 0
         corpo = Template(requests.installconfig).render(
                                         adom=self.adom,
-                                        rev_nome=rev_nome, 
-                                        rev_comentario=rev_comentario, 
+                                        revisao=revisao,
+                                        rev_nome=rev_nome,
+                                        rev_comentario=rev_comentario,
                                         sessao=self.token,
                                         preview=preview
                                     )
@@ -200,16 +201,16 @@ class Manager:
                             )
         return self.enviar(corpo)
 
-    def liberar(self, urls, perfis, tipo="simple", acao="exempt", 
-                status="enable", rev_nome="Liberação de urls via script", 
+    def liberar(self, urls, perfis, tipo="simple", acao="exempt",
+                status="enable", rev_nome="Liberação de urls via script",
                 rev_comentario=""):
         """Libera as `urls` no Firewall para os perfis especificados
-            
+
             Note: É preciso estar logado
 
             Args:
                 urls(:obj:`list` of `str`): Lista de urls a serem liberadas
-                perfis(:obj:`list` of `str`): Lista de perfis que devem 
+                perfis(:obj:`list` of `str`): Lista de perfis que devem
                     ter as `urls` liberadas
                 tipo(str): Tipo de liberação para as urls. Podem ser
                     `regex`, `wildcard` ou `simple`
@@ -220,8 +221,8 @@ class Manager:
                 rev_comentario(str): Comentário para a revisão criada
 
             Returns:
-                `BeautifulSoup` da requisição de instalação e um `dict` 
-                com as respostas das requisições enviadas uma para 
+                `BeautifulSoup` da requisição de instalação e um `dict`
+                com as respostas das requisições enviadas uma para
                 cada `perfil`
         """
         if not tipo in ["regex", "wildcard", "simple"]:
@@ -242,7 +243,7 @@ class Manager:
             except PerfilNaoExiste:
                 print("[-] O perfil de WebUrlFilter '%s' não existe no Manager" % perfil)
                 continue
-            
+
             atual = self.obterUrlsLiberadosPerfil(perfil)
             urls = set(urls).difference(atual)
 
@@ -251,11 +252,11 @@ class Manager:
 
             corpo = Template(requests.seturl).render(
                                             adom=self.adom,
-                                            urls=urls, 
-                                            urlfilter=perfil_id, 
-                                            tipo=tipo, 
+                                            urls=urls,
+                                            urlfilter=perfil_id,
+                                            tipo=tipo,
                                             acao=acao,
-                                            status=status, 
+                                            status=status,
                                             sessao=self.token
                                         )
             respostas[perfil] = self.enviar(corpo)
@@ -263,28 +264,28 @@ class Manager:
         return respostas
 
     def liberarVideosYouTubePlaylist(self, perfis, playlist, quantidade=50, todos=False):
-        """Libera `quantidade` ou todos os videos de uma playlist do 
+        """Libera `quantidade` ou todos os videos de uma playlist do
         YouTube.
 
         Note:
-            É preciso estar logado no Manager. É preciso especificar 
-            o atributo YouTube. Os são obtidos por ordem de data de 
+            É preciso estar logado no Manager. É preciso especificar
+            o atributo YouTube. Os são obtidos por ordem de data de
             postagem, dos mais recentes para os mais antigos.
 
         Args:
-            perfis(:obj:`list` of `str`): Perfis para os quais os videos 
+            perfis(:obj:`list` of `str`): Perfis para os quais os videos
                 serão liberados
             playlist(str): O id da playlist do YouTube
-            quantidade(int): A quantidade de videos a serem liberados 
+            quantidade(int): A quantidade de videos a serem liberados
                 por padrão, são 50 (os 50 mais recentes da playlist)
-            todos(bool): Todos os videos da playlist. Quando especificado 
-                como True, libera TODOS os videos, e ignora o parâmetro 
+            todos(bool): Todos os videos da playlist. Quando especificado
+                como True, libera TODOS os videos, e ignora o parâmetro
                 quantidade.
 
         Returns:
             `BeautifulSoup` resultado da requisição
         """
-        if not self.token: 
+        if not self.token:
             raise NaoLogado()
 
         if todos:
@@ -318,6 +319,6 @@ class ErroDeOperacao(Exception):
     def __init__(self, status, msg):
         self.status = status
         self.msg = msg
-    
+
     def __str__(self):
         return "Houve um erro no processamento do Manager com status '"+self.status+"' e mensagem '"+self.msg+"'."
